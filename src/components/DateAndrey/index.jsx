@@ -10,7 +10,6 @@ import {
     button_days,
     popap_year,
     popap_wrapper,
-    hide,
     popap_year_years,
     popap_year_months,
     select_year_and_month,
@@ -58,7 +57,6 @@ const DateAndrey = () => {
         'Октябрь',
         'Ноябрь',
         'Декабрь',
-
     ]
 
     const onPrevMonth = () => {
@@ -76,119 +74,78 @@ const DateAndrey = () => {
         else setMonth(month + 1);
     }
 
-    const [displyPopapYear, setDisplyPopapYear] = useState(false)
+    const [displyPopup, setDisplyPopup] = useState('');
 
-    const [displyPopapMonth, setDisplyPopapMonth] = useState(false)
-    const Popap = {
-        isOpenYear: () => {
-            setDisplyPopapYear(true)
-        },
-        isCloseYear: () => {
-
-            setDisplyPopapYear(false)
-
-        },
-        isOpenMonth: () => { setDisplyPopapMonth(true); },
-        isCloseMonth: () => { setDisplyPopapMonth(false); }
-    }
-    document.body.addEventListener('click', (e) => {
-        switch (e.target.className) {
-            case popap_year_years:
-            case popap_wrapper + ' ' + popap_wrapper_year:
-            case popap_year: break;
-            default: if (displyPopapYear) Popap.isCloseYear(); break;
-        }
-    })
-    document.body.addEventListener('click', (e) => {
-        switch (e.target.className) {
-            case popap_year_months:
-            case popap_wrapper + ' ' + popap_wrapper_month:
-            case popap_month: break;
-            default: if (displyPopapMonth) Popap.isCloseMonth(); break;
-        }
-    })
     const years = []
     for (let i = new Date().getFullYear(); i >= 1970; i--) {
         years.push(i);
     }
-    const onSetYear = (y) => setYear(y)
-    const onYear = (y) => {
-        onSetYear(y);
-        Popap.isCloseYear();
+
+    const onClickEvent = ({ target: { id } }) => {
+        if (id) setDisplyPopup(id.slice(id.match('__')['index'] + 2));
     }
 
-    const onSetMonth = (m) => setMonth(m)
-    const onMonth = (m) => {
-        onSetMonth(m);
-        Popap.isCloseMonth();
+    const onBlurEvent = (e) => {
+        if (e.target.tabIndex === 1) {
+            setDisplyPopup('')
+        }
     }
+
 
     return (
         <div className={date_picker}>
-            <div className={date_picker_date}>
+            <div
+                tabIndex={1}
+                className={date_picker_date}
+                onClick={onClickEvent}
+                onBlur={onBlurEvent}
+            >
                 <button
                     className={btn}
                     onClick={onPrevMonth}> &#60; </button>
-                <button
-                    className={btn}
-                    onClick={Popap.isOpenYear}>{year}</button>
-                <button
-                    className={btn}
-                    onClick={Popap.isOpenMonth}>{ArrayMonth[month]}</button>
+                <div
+                    id={'choise__year'}
+                    className={btn}>{year}</div>
+                <div
+                    id={'choise__month'}
+                    className={btn}>{ArrayMonth[month]}</div>
                 <button
                     className={btn}
                     onClick={onNextMonth}>&#62; </button>
-
-                <div className={displyPopapYear ? popap_wrapper + ' ' + popap_wrapper_year : hide}>
-                    <div className={popap_year}>
-                        {years.map((y, idx) => {
-                            if (y === year) {
-                                return (
-                                    <div
-                                        id={select_year_and_month}
-                                        className={popap_year_years}
-                                        onClick={() => onYear(y)}
-                                        key={idx}>{y}</div>
-                                )
-                            }
-                            else {
-                                return (
-                                    <div
-                                        className={popap_year_years}
-                                        onClick={() => onYear(y)}
-                                        key={idx}>{y}</div>
-                                )
-                            }
-                        })}
+                {displyPopup === 'year' && (
+                    <div className={`${popap_wrapper} ${popap_wrapper_year}`}>
+                        <div className={popap_year}>
+                            {years.map((y, idx) => {
+                                const click = () => {
+                                    setYear(y);
+                                    setDisplyPopup('');
+                                }
+                                return <div
+                                    id={y === year ? select_year_and_month : ''}
+                                    className={popap_year_years}
+                                    onClick={click}
+                                    key={idx}>{y}</div>
+                            })}
+                        </div>
                     </div>
-                </div>
-
-
-                <div className={displyPopapMonth ? popap_wrapper + ' ' + popap_wrapper_month : hide}>
-                    <div className={popap_month}>
-                        {ArrayMonth.map((m, idx) => {
-
-                            if (idx === month) {
-                                return (
-                                    <div
-                                        id={select_year_and_month}
-                                        className={popap_year_months}
-                                        onClick={() => onMonth(idx)}
-                                        key={idx}>{m}</div>
-                                )
-                            }
-                            else {
-                                return (
-                                    <div
-                                        className={popap_year_months}
-                                        onClick={() => onMonth(idx)}
-                                        key={idx}>{m}</div>
-                                )
-                            }
-                        })}
+                )}
+                {displyPopup === 'month' && (
+                    <div className={`${popap_wrapper} ${popap_wrapper_month}`}>
+                        <div className={popap_month}>
+                            {ArrayMonth.map((m, idx) => {
+                                const click = () => {
+                                    setMonth(idx);
+                                    setDisplyPopup('');
+                                }
+                                return <div
+                                    id={idx === month ? select_year_and_month : ''}
+                                    className={popap_year_months}
+                                    onClick={click}
+                                    key={idx}>{m}</div>
+                            })}
+                        </div>
                     </div>
-                </div>
-
+                )}
             </div>
             <div className={date_picker_week}>
                 <span>Пн</span>

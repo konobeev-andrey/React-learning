@@ -5,11 +5,13 @@ import DateAndrey from './components/DateAndrey'
 
 const App = () => {
 
+
+
     return  (
         <div>
-        
-            <DatePicker/>
-            <DateAndrey/>
+
+            {/* <DatePicker/>
+            <DateAndrey/> */}
         </div>
     );
 }
